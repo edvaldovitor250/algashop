@@ -1,0 +1,8 @@
+[submodule "microservices/billing"]
+	path = microservices/billing
+	url = https://github.com/edvaldovitor250/edvaldovitor250-algashop-billing.git
+	branch = main
+[submodule "microservices/ordering"]
+	path = microservices/ordering
+	url = https://github.com/edvaldovitor250/algashop-ordering.git
+	branch = master

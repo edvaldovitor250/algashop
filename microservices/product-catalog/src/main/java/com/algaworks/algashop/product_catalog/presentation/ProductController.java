@@ -1,21 +1,42 @@
 package com.algaworks.algashop.product_catalog.presentation;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.UUID;
+
+import com.algaworks.algashop.product.catalog.presentation.ProductDetailOutput;
 
 @RestController
 @RequestMapping("/api/v1/products")
 public class ProductController {
 
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public ProductDetailOutput create(@RequestBody ProductInput input) {
+        return ProductDetailOutput.builder()
+                .id(UUID.randomUUID())
+                .addedAt(OffsetDateTime.now())
+                .inStock(false)
+                .name(input.getName())
+                .brand(input.getBrand())
+                .description(input.getDescription())
+                .regularPrice(input.getRegularPrice())
+                .salePrice(input.getSalePrice())
+                .enabled(input.getEnabled())
+                .category(
+                        CategoryMinimalOutput.builder()
+                                .id(input.getCategoryId())
+                                .name("Notebook")
+                                .build()
+                )
+                .build();
+    }
+
     @GetMapping("/{productId}")
-    public com.algaworks.algashop.product.catalog.presentation.ProductDetailOutput findById(@PathVariable UUID productId) {
-        return com.algaworks.algashop.product.catalog.presentation.ProductDetailOutput.builder()
+    public ProductDetailOutput findById(@PathVariable UUID productId) {
+        return ProductDetailOutput.builder()
                 .id(productId)
                 .addedAt(OffsetDateTime.now())
                 .name("Notebook X11")
@@ -23,10 +44,12 @@ public class ProductController {
                 .description("A Gamer Notebook")
                 .regularPrice(new BigDecimal("1500.00"))
                 .salePrice(new BigDecimal("1000.00"))
-                .inStock(false)
+                .inStock(true)
                 .enabled(true)
-                .categoryId(UUID.randomUUID())
+                .category(CategoryMinimalOutput.builder()
+                        .id(UUID.randomUUID())
+                        .name("Notebook")
+                        .build())
                 .build();
     }
-
 }

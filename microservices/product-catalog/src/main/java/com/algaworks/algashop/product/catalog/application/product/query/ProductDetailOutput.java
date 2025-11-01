@@ -1,6 +1,5 @@
-package com.algaworks.algashop.product.catalog.presentation;
+package com.algaworks.algashop.product.catalog.application.product.query;
 
-import com.algaworks.algashop.product_catalog.presentation.CategoryMinimalOutput;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,7 +22,6 @@ public class ProductDetailOutput {
     private BigDecimal salePrice;
     private Boolean inStock;
     private Boolean enabled;
-    private UUID categoryId;
     private CategoryMinimalOutput category;
     private String description;
 }

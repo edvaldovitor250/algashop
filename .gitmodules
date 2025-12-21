@@ -9,3 +9,4 @@
 [submodule "microservices/billing-scheduler"]
 	path = microservices/billing-scheduler
 	url = https://github.com/edvaldovitor250/ems-algashop-billing-scheduler.git
+	branch = main

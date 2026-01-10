@@ -4,6 +4,9 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.OffsetDateTime;
 import java.util.Objects;
@@ -28,6 +31,7 @@ public class Category {
     private OffsetDateTime updatedAt;
 
     public Category(String name, Boolean enabled) {
+        this.id = UUID.randomUUID();
         this.setName(name);
         this.setEnabled(enabled);
         this.createdAt = OffsetDateTime.now();

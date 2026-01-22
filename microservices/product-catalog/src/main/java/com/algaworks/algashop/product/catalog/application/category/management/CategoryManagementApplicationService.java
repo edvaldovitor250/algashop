@@ -14,6 +14,7 @@ import java.util.UUID;
 public class CategoryManagementApplicationService {
 
     private final CategoryRepository categoryRepository;
+    
 
     public UUID create(@Valid CategoryInput input) {
         Category category = new Category(input.getName(), input.getEnabled());

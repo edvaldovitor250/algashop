@@ -37,7 +37,7 @@ public class ProductManagementApplicationService {
     }
 
     private Category findCategory(@NotNull UUID categoryId) {
-        return categoryRepository.findById(categoryId).orElseThrow(()-> new ResourceNotFoundException());
+        return categoryRepository.findById(categoryId).orElseThrow(()-> new CategoryNotFoundException(categoryId));
     }
 
     public void update(UUID productId, ProductInput input) {

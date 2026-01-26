@@ -24,7 +24,7 @@ public class CategoryManagementApplicationService {
 
     public void update(UUID categoryId, CategoryInput input) {
         Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new ResourceNotFoundException());
+                .orElseThrow(() -> new CategoryNotFoundException(categoryId));
         category.setName(input.getName());
         category.setEnabled(input.getEnabled());
         categoryRepository.save(category);
@@ -32,7 +32,7 @@ public class CategoryManagementApplicationService {
 
     public void disable(UUID categoryId) {
         Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new ResourceNotFoundException());
+                .orElseThrow(() -> new CategoryNotFoundException(categoryId));
         category.setEnabled(false);
         categoryRepository.save(category);
     }

@@ -1,69 +1,79 @@
 package com.algaworks.algashop.product.catalog.presentation;
 
-import com.algaworks.algashop.product.catalog.application.ResourceNotFoundException;
-import com.algaworks.algashop.product.catalog.domain.model.DomainEntityNotFoundException;
-import com.algaworks.algashop.product.catalog.domain.model.DomainException;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.http.*;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import java.util.UUID;
 
-import java.net.URI;
-import java.util.Map;
-import java.util.stream.Collectors;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
-@AllArgsConstructor
-@RestControllerAdvice
-@Slf4j
-public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
+import com.algaworks.algashop.product.catalog.application.PageModel;
+import com.algaworks.algashop.product.catalog.application.product.management.ProductInput;
+import com.algaworks.algashop.product.catalog.application.product.management.ProductManagementApplicationService;
+import com.algaworks.algashop.product.catalog.application.product.query.ProductDetailOutput;
+import com.algaworks.algashop.product.catalog.application.product.query.ProductQueryService;
+import com.algaworks.algashop.product.catalog.domain.model.category.CategoryNotFoundException;
 
-    private final MessageSource messageSource;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
-    @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
-                                                                  HttpHeaders headers,
-                                                                  HttpStatusCode status,
-                                                                  WebRequest request) {
-        ProblemDetail problemDetail = ProblemDetail.forStatus(status);
-        problemDetail.setTitle("Invalid fields");
-        problemDetail.setDetail("One or more fields are invalid");
-        problemDetail.setType(URI.create("/errors/invalid-fields"));
+@RestController
+@RequestMapping("/api/v1/products")
+@RequiredArgsConstructor
+public class ProductController {
 
-        Map<String, String> fieldErrors = ex.getBindingResult().getAllErrors().stream().collect(
-                Collectors.toMap(
-                        objectError -> ((FieldError) objectError).getField(),
-                        objectError -> messageSource.getMessage(objectError, LocaleContextHolder.getLocale())
-                )
-        );
+    private final ProductQueryService productQueryService;
+    private final ProductManagementApplicationService productManagementApplicationService;
 
-        problemDetail.setProperty("fields", fieldErrors);
-
-        return super.handleExceptionInternal(ex, problemDetail, headers, status, request);
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public ProductDetailOutput create(@RequestBody @Valid ProductInput input) {
+        UUID productId;
+        try {
+            productId = productManagementApplicationService.create(input);
+        } catch (CategoryNotFoundException e) {
+            throw new UnprocessableContentException(e.getMessage(), e);
+        }
+        return productQueryService.findById(productId);
     }
 
-    @ExceptionHandler({DomainEntityNotFoundException.class, ResourceNotFoundException.class})
-    public ProblemDetail handleResourceNotFoundException(Exception exception) {
-        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
-        problemDetail.setTitle("Not found");
-        problemDetail.setDetail(exception.getMessage());
-        problemDetail.setType(URI.create("/errors/not-found"));
-        return problemDetail;
+    @GetMapping("/{productId}")
+    public ProductDetailOutput findById(@PathVariable UUID productId) {
+        return productQueryService.findById(productId);
     }
 
-    @ExceptionHandler({DomainException.class, UnprocessableContentException.class})
-    public ProblemDetail handleUnprocessableContentException(Exception e) {
-        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.UNPROCESSABLE_CONTENT);
-        problemDetail.setTitle("Unprocessable Content");
-        problemDetail.setDetail(e.getMessage());
-        problemDetail.setType(URI.create("/errors/unprocessable-content"));
-        return problemDetail;
+    @PutMapping("/{productId}")
+    public ProductDetailOutput update(@PathVariable UUID productId,
+                                      @RequestBody @Valid ProductInput input) {
+        productManagementApplicationService.update(productId, input);
+        return productQueryService.findById(productId);
+    }
+
+    @DeleteMapping("/{productId}/enable")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void disable(@PathVariable UUID productId) {
+        productManagementApplicationService.disable(productId);
+    }
+
+    @PutMapping("/{productId}/enable")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void enable(@PathVariable UUID productId) {
+        productManagementApplicationService.enable(productId);
+    }
+
+    @GetMapping
+    public PageModel<ProductDetailOutput> filter(
+            @RequestParam(name = "size", required = false) Integer size,
+            @RequestParam(name = "number", required = false) Integer number
+    ) {
+        return productQueryService.filter(size, number);
     }
 
 }

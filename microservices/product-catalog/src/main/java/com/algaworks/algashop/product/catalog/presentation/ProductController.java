@@ -69,7 +69,7 @@ public class ProductController {
     }
 
     @GetMapping
-    public PageModel<ProductDetailOutput> filter(
+    public PageModel<ProductSummaryOutput> filter(
             @RequestParam(name = "size", required = false) Integer size,
             @RequestParam(name = "number", required = false) Integer number
     ) {

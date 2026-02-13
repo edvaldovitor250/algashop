@@ -27,6 +27,8 @@ public class ProductQueryServiceImpl implements ProductQueryService {
 
     @Override
     public PageModel<ProductDetailOutput> filter(Integer size, Integer number) {
-        return null;
+       PageModel<Product> products = productRepository.findAll(PageRequest.of(number,size));
+       Page<ProductSummaryOutput> mapped = products.map(product -> mapper.convert(product, ProductSummaryOutput.class));
+        return PageModel.of(mapper);
     }
 }

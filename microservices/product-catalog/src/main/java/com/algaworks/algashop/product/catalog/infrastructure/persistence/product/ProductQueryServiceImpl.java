@@ -15,6 +15,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.aggregation.AggregationExpressionCriteria;
+import org.springframework.data.mongodb.core.aggregation.ComparisonOperators;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
@@ -95,16 +97,30 @@ public class ProductQueryServiceImpl implements ProductQueryService {
             }
         }
 
-        if( filter.getPriceFrom() != null && filter.getPriceTo() != null) {
-            query.addCriteria(Criteria.where("price")
+        if (filter.getPriceFrom() != null && filter.getPriceTo() != null ) {
+            query.addCriteria(Criteria.where("salePrice")
                     .gte(filter.getPriceFrom())
                     .lte(filter.getPriceTo())
             );
         } else {
             if (filter.getPriceFrom() != null) {
-                query.addCriteria(Criteria.where("price").gte(filter.getPriceFrom()));
+                query.addCriteria(Criteria.where("salePrice").gte(filter.getPriceFrom()));
             } else if (filter.getPriceTo() != null) {
-                query.addCriteria(Criteria.where("price").lte(filter.getPriceTo()));
+                query.addCriteria(Criteria.where("salePrice").lte(filter.getPriceTo()));
+            }
+        }
+
+        if (filter.getHasDiscount() != null) {
+            if (filter.getHasDiscount()) {
+                query.addCriteria(AggregationExpressionCriteria.whereExpr(
+                        ComparisonOperators.valueOf("$salePrice")
+                                .lessThan("$regularPrice")
+                ));
+            } else {
+                query.addCriteria(AggregationExpressionCriteria.whereExpr(
+                        ComparisonOperators.valueOf("$salePrice")
+                                .equalTo("$regularPrice")
+                ));
             }
         }
 

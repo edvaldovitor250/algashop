@@ -3,12 +3,10 @@ package com.algaworks.algashop.product.catalog.domain.model.product;
 import com.algaworks.algashop.product.catalog.domain.model.DomainException;
 import com.algaworks.algashop.product.catalog.domain.model.IdGenerator;
 import com.algaworks.algashop.product.catalog.domain.model.category.Category;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.annotation.*;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
@@ -22,8 +20,8 @@ import java.util.UUID;
 
 @Document(collection = "products")
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@NoArgsConstructor
 public class Product {
 
     @Id
@@ -32,6 +30,7 @@ public class Product {
 
     private String name;
 
+    @Indexed(name = "idx_product_by_brand")
     private String brand;
 
     private String description;
@@ -59,6 +58,7 @@ public class Product {
     @LastModifiedBy
     private UUID lastModifiedByUserId;
 
+    @Indexed(name = "idx_product_by_category")
     @DocumentReference
     @Field(name = "categoryId")
     private Category category;

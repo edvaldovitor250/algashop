@@ -33,11 +33,15 @@ public class Product {
     @EqualsAndHashCode.Include
     private UUID id;
 
+
+
+    @TextIndexed
     private String name;
 
     @Indexed(name = "idx_product_by_brand")
     private String brand;
 
+    @TextIndexed(weight = 5)
     private String description;
 
     private Integer quantityInStock = 0;
@@ -68,6 +72,9 @@ public class Product {
     private Category category;
 
     private Integer discountPercentageRounded;
+
+    @TextScore
+    private Float textScore;
 
     @Builder
     public Product(String name, String brand, String description,

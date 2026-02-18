@@ -24,9 +24,9 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @CompoundIndex(name = "idx_product_by_category_enabled_salePrice",
-        def = "{'categoryId': 1, 'enabled': 1, 'salePrice': 1}")
+        def = "{'categoryId': 1, 'enabled': 1, 'salePrice': 1}", partialFilterExpression = "{'enabled': true}")
 @CompoundIndex(name = "idx_product_by_category_enabled_addedAt",
-        def = "{'categoryId': 1, 'enabled': 1, 'addedAt': -1}")
+        def = "{'categoryId': 1, 'enabled': 1, 'addedAt': -1}", partialFilterExpression = "{'enabled': true}")
 public class Product {
 
     @Id

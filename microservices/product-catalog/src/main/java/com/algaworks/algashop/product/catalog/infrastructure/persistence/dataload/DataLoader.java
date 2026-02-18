@@ -67,7 +67,7 @@ public class DataLoader implements ApplicationRunner {
 
         try {
             if (Boolean.TRUE.equals(properties.getAutoDrop())) {
-                mongoOperations.getCollection(collectionName).drop();
+                mongoOperations.getCollection(collectionName).deleteMany(new BsonDocument());
             }
             return mongoOperations.insert(mongoDocs, collectionName).size();
         } catch (Exception e) {

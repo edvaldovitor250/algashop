@@ -1,16 +1,28 @@
 package com.algaworks.algashop.product.catalog.presentation;
 
+import java.util.UUID;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.algaworks.algashop.product.catalog.application.PageModel;
 import com.algaworks.algashop.product.catalog.application.category.management.CategoryInput;
 import com.algaworks.algashop.product.catalog.application.category.management.CategoryManagementApplicationService;
 import com.algaworks.algashop.product.catalog.application.category.query.CategoryDetailOutput;
+import com.algaworks.algashop.product.catalog.application.category.query.CategoryFilter;
 import com.algaworks.algashop.product.catalog.application.category.query.CategoryQueryService;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/categories")
@@ -21,9 +33,8 @@ public class CategoryController {
     private final CategoryManagementApplicationService categoryManagementApplicationService;
 
     @GetMapping
-    public PageModel<CategoryDetailOutput> filter(@RequestParam(defaultValue = "0") Integer page,
-                                                  @RequestParam(defaultValue = "10") Integer size) {
-        return categoryQueryService.filter(size,page);
+    public PageModel<CategoryDetailOutput> filter(@ModelAttribute CategoryFilter filter) {
+        return categoryQueryService.filter(filter);
     }
 
     @PostMapping

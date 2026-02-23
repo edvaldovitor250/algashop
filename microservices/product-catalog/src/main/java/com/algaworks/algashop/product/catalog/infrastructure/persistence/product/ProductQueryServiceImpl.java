@@ -11,12 +11,14 @@ import com.algaworks.algashop.product.catalog.domain.model.product.ProductNotFou
 import com.algaworks.algashop.product.catalog.domain.model.product.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.bson.Document;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.CriteriaDefinition;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.stereotype.Service;
 
@@ -49,19 +51,23 @@ public class ProductQueryServiceImpl implements ProductQueryService {
 
         long totalElements = mongoOperations.count(query, Product.class);
 
-        if (totalElements == 0) {
+        if (totalElements == 0L) {
             return PageModel.<ProductSummaryOutput>builder()
-                    .content(new ArrayList<>())
-                    .number(filter.getPage())
-                    .size(filter.getSize())
-                    .totalElements(0)
+                    .number(0)
+                    .size(0)
                     .totalPages(0)
+                    .totalElements(0)
                     .build();
         }
 
         List<AggregationOperation> operations = new ArrayList<>();
 
-        textCriteria.ifPresent(c -> operations.add(match(c)));
+        textCriteria.ifPresent(c -> {
+            operations.add(match(c));
+            AggregationOperation addTextScoreField = context ->
+                    new Document("$addFields", new Document("score", new Document("$meta", "textScore")));
+            operations.add(addTextScoreField);
+        });
         criteria.ifPresent(c -> operations.add(match(c)));
 
         PageRequest pageRequest = PageRequest.of(filter.getPage(), filter.getSize());
@@ -81,8 +87,7 @@ public class ProductQueryServiceImpl implements ProductQueryService {
                 .aggregate(aggregation, Product.class, ProductSummaryOutput.class)
                 .getMappedResults();
 
-            
-        int totalPages = (int) Math.ceil((double) totalElements / pageRequest.getPageSize());
+        int totalPages = (int) Math.ceil((double) totalElements / (double) filter.getSize());
 
         return PageModel.<ProductSummaryOutput>builder()
                 .content(productSummaryOutputs)
@@ -106,7 +111,14 @@ public class ProductQueryServiceImpl implements ProductQueryService {
                 .and("discountPercentageRounded").as("discountPercentageRounded")
                 .and("score").as("score")
                 .and("category._id").as("category._id")
-                .and("category.name").as("category.name");
+                .and("category.name").as("category.name")
+                .and("score").as("score")
+
+                .andExpression("salePrice < regularPrice").as("hasDiscount")
+                .andExpression("quantityInStock > 0").as("inStock")
+                .and(StringOperators.Substr.valueOf("description")
+                        .substring(0, 50)).as("shortDescription");
+
     }
 
     private Optional<Criteria> buildCriteria(ProductFilter filter) {

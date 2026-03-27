@@ -24,9 +24,9 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @CompoundIndex(name = "idx_product_by_category_enabled_salePrice",
-        def = "{'categoryId': 1, 'enabled': 1, 'salePrice': 1}", partialFilterExpression = "{'enabled': true}")
+        def = "{'category.id': 1, 'enabled': 1, 'salePrice': 1}", partialFilterExpression = "{'enabled': true}")
 @CompoundIndex(name = "idx_product_by_category_enabled_addedAt",
-        def = "{'categoryId': 1, 'enabled': 1, 'addedAt': -1}", partialFilterExpression = "{'enabled': true}")
+        def = "{'category.id': 1, 'enabled': 1, 'addedAt': -1}", partialFilterExpression = "{'enabled': true}")
 public class Product {
 
     @Id
@@ -65,7 +65,6 @@ public class Product {
     @LastModifiedBy
     private UUID lastModifiedByUserId;
 
-    private UUID categoryId;
 
     private ProductCategory category;
 
@@ -142,7 +141,6 @@ public class Product {
 
     public void setCategory(Category category) {
         Objects.requireNonNull(category);
-        this.categoryId = category.getId();
         this.category = ProductCategory.of(category);
     }
 

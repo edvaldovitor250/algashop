@@ -17,6 +17,9 @@ import java.math.RoundingMode;
 import java.time.OffsetDateTime;
 import java.util.Objects;
 import java.util.UUID;
+import com.algaworks.algashop.product.catalog.domain.model.product.ProductAddedEvent;
+import com.algaworks.algashop.product.catalog.domain.model.product.ProductListedEvent;
+import com.algaworks.algashop.product.catalog.domain.model.product.ProductDelistedEvent;
 
 @Document(collection = "products")
 @Getter
@@ -85,6 +88,9 @@ public class Product extends AbstractAggregateRoot<Product> {
         this.setRegularPrice(regularPrice);
         this.setSalePrice(salePrice);
         this.setCategory(category);
+        super.registerEvent(ProductAddedEvent.builder()
+            .productId(this.id)
+            .build());
     }
 
     public void setName(String name) {
@@ -107,7 +113,26 @@ public class Product extends AbstractAggregateRoot<Product> {
 
     public void setEnabled(Boolean enabled) {
         Objects.requireNonNull(enabled);
+
+        Boolean wasEnabled = this.enabled;
+
+        if (Objects.equals(wasEnabled, enabled)) {
+            return;
+        }
+
         this.enabled = enabled;
+
+        if (Boolean.TRUE.equals(wasEnabled) && !Boolean.TRUE.equals(enabled)) {
+            super.registerEvent(ProductDelistedEvent.builder()
+                    .productId(this.id)
+                    .build());
+        }
+
+        if (!Boolean.TRUE.equals(wasEnabled) && Boolean.TRUE.equals(enabled)) {
+            super.registerEvent(ProductListedEvent.builder()
+                    .productId(this.id)
+                    .build());
+        }
     }
 
     public void setCategory(Category category) {

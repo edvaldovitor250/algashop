@@ -14,4 +14,9 @@ import java.util.UUID;
 public class CategoryMinimalOutput {
     private UUID id;
     private String name;
+    private Boolean enabled;
+
+    public String getSlug() {
+        return Slugfier.slugify(this.getName());
+    }
 }

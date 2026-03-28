@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ProductEventListener {
 
+
     @EventListener(ProductPriceChangedEvent.class)
     private void handle(ProductPriceChangedEvent event) {
         log.info("Handling ProductPriceChangedEvent: {}", event);

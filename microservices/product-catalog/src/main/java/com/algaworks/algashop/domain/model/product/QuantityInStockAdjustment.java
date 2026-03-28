@@ -9,6 +9,15 @@ public interface QuantityInStockAdjustment {
         UUID productId,
         int previousQuantity,
         int newQuantity
-    )
+    ){
+
+        public boolean isOutOfStock() {
+            return newQuantity == 0 && previousQuantity != 0;
+        }
+
+        public boolean isRestocked() {
+            return newQuantity > 0 && previousQuantity == 0;
+        }
+    }
 
 }

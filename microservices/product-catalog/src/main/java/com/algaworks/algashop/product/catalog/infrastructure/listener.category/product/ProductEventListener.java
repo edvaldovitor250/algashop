@@ -41,4 +41,15 @@ public class ProductEventListener {
         log.info("Handling ProductDelistedEvent: {}", event);
     }
 
+       @EventListener(ProductListedEvent.class)
+    private void handle(ProductListedEvent event) {
+        log.info("Handling ProductListedEvent: {}", event);
+    }
+
+    @EventListener(ProductDelistedEvent.class)
+    private void handle(ProductDelistedEvent event) {
+        log.info("Handling ProductDelistedEvent: {}", event);
+    }
+
+
 }

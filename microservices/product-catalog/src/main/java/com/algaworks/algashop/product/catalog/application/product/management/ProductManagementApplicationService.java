@@ -1,5 +1,6 @@
 package com.algaworks.algashop.product.catalog.application.product.management;
 
+import com.algaworks.algashop.domain.model.product.StockService;
 import com.algaworks.algashop.product.catalog.application.ResourceNotFoundException;
 import com.algaworks.algashop.product.catalog.domain.model.category.Category;
 import com.algaworks.algashop.product.catalog.domain.model.category.CategoryNotFoundException;
@@ -19,6 +20,8 @@ public class ProductManagementApplicationService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    
+    private final StockService stockService;
 
     public UUID create(ProductInput input) {
         Product product = mapToProduct(input);
@@ -59,6 +62,16 @@ public class ProductManagementApplicationService {
         Product product = findProduct(productId);
         product.enable();
         productRepository.save(product);
+    }
+
+    public void restock(UUID productId, int quantity) {
+        Product product = findProduct(productId);
+        stockService.restock(product, quantity);
+    }
+
+    public void withdraw(UUID productId, int quantity) {
+        Product product = findProduct(productId);
+        stockService.withdraw(product, quantity);
     }
 
     private void updateProduct(Product product, ProductInput input) {

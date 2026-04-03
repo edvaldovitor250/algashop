@@ -20,6 +20,7 @@ public class ProductManagementApplicationService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final StockMovementRepository stockMovementRepository; 
     
     private final StockService stockService;
 
@@ -66,12 +67,14 @@ public class ProductManagementApplicationService {
 
     public void restock(UUID productId, int quantity) {
         Product product = findProduct(productId);
-        stockService.restock(product, quantity);
+        StockMovement restock = stockService.restock(product, quantity);
+        stockMovementRepository.save(restock);
     }
 
     public void withdraw(UUID productId, int quantity) {
         Product product = findProduct(productId);
-        stockService.withdraw(product, quantity);
+        StockMovement withdraw = stockService.withdraw(product, quantity);
+        stockMovementRepository.save(withdraw);
     }
 
     private void updateProduct(Product product, ProductInput input) {

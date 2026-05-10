@@ -21,7 +21,7 @@ public class StockMovemnt {
     private MovementType type;
 
     @Builder
-    public StockMovemnt(UUID productId, Integer movementQuantity, Integer previousQuantity, MovementType type) {
+    public StockMovemnt(UUID productId, Integer movementQuantity, Integer previousQuantity, MovementType type) { 
         this.id = UUID.randomUUID();
         this.occurredAt = OffsetDateTime.now();
         this.productId = productId;

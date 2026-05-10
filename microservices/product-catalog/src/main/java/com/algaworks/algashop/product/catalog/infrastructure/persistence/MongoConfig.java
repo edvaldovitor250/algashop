@@ -28,6 +28,11 @@ public class MongoConfig {
         );
     }
 
+    @Bean 
+    public MongoTransactionManager transactionManager(MongoDatabaseFactory factory) {
+        return new MongoTransactionManager(factory);
+    }
+
     public static class OffsetDateTimeReadConverter implements Converter<Date, OffsetDateTime> {
         @Override
         public @Nullable OffsetDateTime convert(Date source) {

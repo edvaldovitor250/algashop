@@ -17,6 +17,7 @@ public class ProductEventListener {
 
 
     @EventListener(ProductPriceChangedEvent.class)
+    @Async
     private void handle(ProductPriceChangedEvent event) {
         log.info("Handling ProductPriceChangedEvent: {}", event);
     }

@@ -30,4 +30,8 @@ public class ProductDetailOutput {
 
     private Integer quantityInStock;
     private Integer discountPercentagerRounded;
+
+    private Long version;
+
+    private OffsetDateTime uodatedAt;
 }

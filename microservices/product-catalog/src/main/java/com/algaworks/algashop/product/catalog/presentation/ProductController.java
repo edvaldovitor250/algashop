@@ -36,8 +36,15 @@ public class ProductController {
     }
 
     @GetMapping("/{productId}")
-    public ProductDetailOutput findById(@PathVariable UUID productId) {
-        return productQueryService.findById(productId);
+    public ResponseEntity<ProductDetailOutput> findById(@PathVariable UUID productId) {
+        ProductDetailOutput product = productQueryService.findById(productId);
+        return ResponseEntity
+        .ok()
+        .cacheControl(CacheControl.maxAge(Duration.ofMinutes(10)).cachePublic())
+        .etag("product:id:" + productId + ":version:" + product.getVersion())
+        .lastModified(product.getUodatedAt().toInstant().toEpochMilli())
+        .body(product)
+        ;
     }
 
     @PutMapping("/{productId}")

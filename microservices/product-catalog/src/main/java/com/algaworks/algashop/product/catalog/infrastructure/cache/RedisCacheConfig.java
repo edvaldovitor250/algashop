@@ -13,11 +13,19 @@ import org.springframework.data.redis.cache.RedisCacheConfiguration;
 public class RedisCacheConfig {
 
     @Bean
-    public RedisCacheManagerBuilderCustomizer redisCacheManagerBuilderCustomizer() {
-        var defaultCacheConfig = RedisCacheConfiguration.defaultCacheConfig()
-                .computePrefixWith(c -> c + ":");
-        return (builder) -> builder.cacheDefaults(defaultCacheConfig)
-                .withCacheConfiguration("algashop:products:v1", defaultCacheConfig.disableCachingNullValues());
-    }
+ RedisCacheManagerBuilderCustomizer redisCacheManagerBuilderCustomizer() {
+    var defaultCacheConfig = RedisCacheConfiguration.defaultCacheConfig()
+            .computePrefixWith(c -> c + ":")
+            .entryTtl(Duration.ofSeconds(60));
+
+    return builder -> builder
+            .cacheDefaults(defaultCacheConfig)
+            .withCacheConfiguration(
+                    "algashop:products:v1",
+                    defaultCacheConfig
+                            .disableCachingNullValues()
+                            .entryTtl(Duration.ofSeconds(120))
+            );
+}
 
 }

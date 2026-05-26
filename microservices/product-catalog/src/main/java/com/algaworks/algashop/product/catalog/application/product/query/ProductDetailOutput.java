@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductDetailOutput {
+public class ProductDetailOutput implements Serializable {
     private UUID id;
     private OffsetDateTime addedAt;
     private String name;

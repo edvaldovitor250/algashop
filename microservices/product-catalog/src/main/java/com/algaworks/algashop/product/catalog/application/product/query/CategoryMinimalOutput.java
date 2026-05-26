@@ -11,7 +11,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CategoryMinimalOutput {
+public class CategoryMinimalOutput implements Serializable {
     private UUID id;
     private String name;
     private Boolean enabled;

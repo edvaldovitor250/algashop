@@ -1,4 +1,4 @@
-package com.algaworks.algashop.ordering.core.application.utility;
+package com.algaworks.algashop.product.catalog.application.utility;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

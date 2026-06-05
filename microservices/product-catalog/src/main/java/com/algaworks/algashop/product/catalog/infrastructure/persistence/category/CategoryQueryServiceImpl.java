@@ -1,20 +1,23 @@
 package com.algaworks.algashop.product.catalog.infrastructure.persistence.category;
 
 import com.algaworks.algashop.product.catalog.application.PageModel;
-import com.algaworks.algashop.product.catalog.application.ResourceNotFoundException;
 import com.algaworks.algashop.product.catalog.application.category.query.CategoryDetailOutput;
 import com.algaworks.algashop.product.catalog.application.category.query.CategoryFilter;
 import com.algaworks.algashop.product.catalog.application.category.query.CategoryQueryService;
 import com.algaworks.algashop.product.catalog.application.utility.Mapper;
 import com.algaworks.algashop.product.catalog.domain.model.category.Category;
+import com.algaworks.algashop.product.catalog.domain.model.category.CategoryNotFoundException;
 import com.algaworks.algashop.product.catalog.domain.model.category.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.aggregation.AggregationExpressionCriteria;
+import org.springframework.data.mongodb.core.aggregation.ComparisonOperators;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -39,22 +42,21 @@ public class CategoryQueryServiceImpl implements CategoryQueryService {
         PageRequest pageRequest = PageRequest.of(filter.getPage(), filter.getSize(), sort);
         Query pagedQuery = query.with(pageRequest);
 
-        List<Category> categories;
+        List<Category> categorys;
         int totalPages = 0;
 
         if (totalItems > 0) {
-            categories = mongoOperations.find(pagedQuery, Category.class);
+            categorys = mongoOperations.find(pagedQuery, Category.class);
             totalPages = (int) Math.ceil((double) totalItems / pageRequest.getPageSize());
         } else {
-            categories = new ArrayList<>();
+            categorys = new ArrayList<>();
         }
 
-        List<CategoryDetailOutput> outputs = categories.stream()
-                .map(c -> mapper.convert(c, CategoryDetailOutput.class))
+        List<CategoryDetailOutput> categoryOutputs = categorys.stream()
+                .map(p -> mapper.convert(p, CategoryDetailOutput.class))
                 .collect(Collectors.toList());
-
         return PageModel.<CategoryDetailOutput>builder()
-                .content(outputs)
+                .content(categoryOutputs)
                 .number(pageRequest.getPageNumber())
                 .size(pageRequest.getPageSize())
                 .totalElements(totalItems)
@@ -62,18 +64,9 @@ public class CategoryQueryServiceImpl implements CategoryQueryService {
                 .build();
     }
 
-    @Override
-    public CategoryDetailOutput findById(UUID categoryId) {
-        Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new ResourceNotFoundException());
-        return mapper.convert(category, CategoryDetailOutput.class);
-    }
-
     private Sort sortWith(CategoryFilter filter) {
-        if (StringUtils.isBlank(filter.getSortByPropertyOrDefault().getPropertyName())) {
-            return Sort.unsorted();
-        }
-        return Sort.by(filter.getSortDirectionOrDefault(), filter.getSortByPropertyOrDefault().getPropertyName());
+        return Sort.by(filter.getSortDirectionOrDefault(),
+                filter.getSortByPropertyOrDefault().getPropertyName());
     }
 
     private Query queryWith(CategoryFilter filter) {
@@ -84,10 +77,16 @@ public class CategoryQueryServiceImpl implements CategoryQueryService {
         }
 
         if (StringUtils.isNotBlank(filter.getName())) {
-            String regexExpression = String.format("(?i).*%s.*", filter.getName());
-            query.addCriteria(Criteria.where("name").regex(regexExpression));
+            query.addCriteria(Criteria.where("name").regex(filter.getName().trim(), "i"));
         }
 
         return query;
+    }
+
+    @Override
+    public CategoryDetailOutput findById(UUID categoryId) {
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new CategoryNotFoundException(categoryId));
+        return mapper.convert(category, CategoryDetailOutput.class);
     }
 }

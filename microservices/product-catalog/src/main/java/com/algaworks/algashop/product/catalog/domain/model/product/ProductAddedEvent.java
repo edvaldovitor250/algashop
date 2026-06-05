@@ -11,8 +11,7 @@ import java.util.UUID;
 @ToString
 @Builder
 public class ProductAddedEvent {
-    private UUID productId;
-
-    @Builder.Default
-    private OffsetDateTime addedAt = OffsetDateTime.now();
+	private UUID productId;
+	@Builder.Default
+	private OffsetDateTime addedAt = OffsetDateTime.now();
 }

@@ -1,16 +1,13 @@
 package com.algaworks.algashop.product.catalog.application.product.management;
 
-import com.algaworks.algashop.domain.model.product.StockService;
-import com.algaworks.algashop.product.catalog.application.ResourceNotFoundException;
 import com.algaworks.algashop.product.catalog.domain.model.category.Category;
 import com.algaworks.algashop.product.catalog.domain.model.category.CategoryNotFoundException;
 import com.algaworks.algashop.product.catalog.domain.model.category.CategoryRepository;
-import com.algaworks.algashop.product.catalog.domain.model.product.Product;
-import com.algaworks.algashop.product.catalog.domain.model.product.ProductNotFoundException;
-import com.algaworks.algashop.product.catalog.domain.model.product.ProductRepository;
+import com.algaworks.algashop.product.catalog.domain.model.product.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -20,8 +17,8 @@ public class ProductManagementApplicationService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
-    private final StockMovementRepository stockMovementRepository; 
-    
+    private final StockMovementRepository stockMovementRepository;
+
     private final StockService stockService;
 
     public UUID create(ProductInput input) {
@@ -68,25 +65,27 @@ public class ProductManagementApplicationService {
     @Transactional
     public void restock(UUID productId, int quantity) {
         Product product = findProduct(productId);
-        StockMovement restock = stockService.restock(product, quantity);
-        stockMovementRepository.save(restock);
+        StockMovement movement = stockService.restock(product, quantity);
+        stockMovementRepository.save(movement);
+        if (quantity == 2) {
+            throw new RuntimeException();
+        }
     }
 
     @Transactional
     public void withdraw(UUID productId, int quantity) {
         Product product = findProduct(productId);
-        StockMovement withdraw = stockService.withdraw(product, quantity);
-        stockMovementRepository.save(withdraw);
+        StockMovement movement = stockService.withdraw(product, quantity);
+        stockMovementRepository.save(movement);
     }
 
     private void updateProduct(Product product, ProductInput input) {
         product.setName(input.getName());
         product.setBrand(input.getBrand());
         product.setDescription(input.getDescription());
-        product.setRegularPrice(input.getRegularPrice());
         product.setEnabled(input.getEnabled());
 
-        product.changeSalePrice(input.getSalePrice(), input.getRegularPrice());
+        product.changePrice(input.getRegularPrice(), input.getSalePrice());
     }
 
     private Product findProduct(UUID productId) {

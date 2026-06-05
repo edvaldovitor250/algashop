@@ -9,23 +9,17 @@ import org.springframework.data.domain.Sort;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class CategoryFilter extends SortablePageFilter<CategoryFilter.SortType> {
-
     private String name;
-
     private Boolean enabled;
 
-    public CategoryFilter(int size, int page) {
-        super(size, page);
-    }
-
     @Override
-    public SortType getSortByPropertyOrDefault() {
-        return SortType.NAME;
+    public CategoryFilter.SortType getSortByPropertyOrDefault() {
+        return getSortByProperty() == null ? CategoryFilter.SortType.NAME: getSortByProperty();
     }
 
     @Override
     public Sort.Direction getSortDirectionOrDefault() {
-        return Sort.Direction.ASC;
+        return getSortDirection() == null ? Sort.Direction.ASC : getSortDirection();
     }
 
     @Getter

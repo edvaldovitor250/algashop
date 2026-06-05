@@ -1,9 +1,11 @@
 package com.algaworks.algashop.product.catalog.application;
 
+import com.algaworks.algashop.product.catalog.application.product.query.ProductSummaryOutput;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.domain.Page;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +23,7 @@ public class PageModel<T> {
     @Builder.Default
     private List<T> content = new ArrayList<>();
 
-    public static<T> PageModel<T> of(Page<T> page){
+    public static <T> PageModel<T> of(Page<T> page) {
         return PageModel.<T>builder()
                 .content(page.getContent())
                 .number(page.getNumber())
@@ -29,7 +31,5 @@ public class PageModel<T> {
                 .totalPages(page.getTotalPages())
                 .totalElements(page.getTotalElements())
                 .build();
-                
     }
-
 }

@@ -1,19 +1,18 @@
 package com.algaworks.algashop.product.catalog.infrastructure.message;
 
-import org.springframework.beans.factory.annotation.Configurable;
+import com.algaworks.algashop.product.catalog.application.ApplicationMessagePublisher;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-import com.algaworks.algashop.product.catalog.application.ApplicationMessagePublisher;
-
-@Configurable
+@Configuration
 public class ApplicationMessagePublisherConfig {
 
     @Bean
     public ApplicationMessagePublisher applicationMessagePublisher(
-        ApplicationEventPublisher applicationEventPublisher
+            ApplicationEventPublisher applicationEventPublisher
     ) {
         return applicationEventPublisher::publishEvent;
     }
-    
+
 }

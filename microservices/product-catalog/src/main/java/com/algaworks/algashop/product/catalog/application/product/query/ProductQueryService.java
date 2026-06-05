@@ -1,6 +1,7 @@
 package com.algaworks.algashop.product.catalog.application.product.query;
 
 import com.algaworks.algashop.product.catalog.application.PageModel;
+import org.springframework.cache.annotation.Cacheable;
 
 import java.util.UUID;
 

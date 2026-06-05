@@ -1,13 +1,14 @@
 package com.algaworks.algashop.product.catalog.application.product.query;
 
-import java.math.BigDecimal;
-import java.time.OffsetDateTime;
-import java.util.UUID;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.time.OffsetDateTime;
+import java.util.UUID;
 
 @Data
 @Builder
@@ -29,9 +30,8 @@ public class ProductDetailOutput implements Serializable {
     private Boolean hasDiscount;
 
     private Integer quantityInStock;
-    private Integer discountPercentagerRounded;
+    private Integer discountPercentageRounded;
 
     private Long version;
-
-    private OffsetDateTime uodatedAt;
+    private OffsetDateTime updatedAt;
 }

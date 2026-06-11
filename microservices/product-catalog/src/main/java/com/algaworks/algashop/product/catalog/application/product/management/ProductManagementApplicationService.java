@@ -21,10 +21,13 @@ public class ProductManagementApplicationService {
 
     private final StockService stockService;
 
-    public UUID create(ProductInput input) {
+    private final Mapper mapper;
+
+    @CachPut(cacheNames = "algashop:products:v1", key = "#result.id", condition = "#input.enabled == true")
+    public ProductDetailOutput create(ProductInput input) {
         Product product = mapToProduct(input);
         productRepository.save(product);
-        return product.getId();
+        return mapper.toDetailOutput(product, ProductDetailOutput.class);
     }
 
     private Product mapToProduct(ProductInput input) {
@@ -40,7 +43,8 @@ public class ProductManagementApplicationService {
                 .build();
     }
 
-    public void update(UUID productId, ProductInput input) {
+    @CachPut(cacheNames = "algashop:products:v1", key = "#productId", condition = "#input.enabled == true")
+    public ProductDetailOutput update(UUID productId, ProductInput input) {
         Product product = findProduct(productId);
         Category category = findCategory(input.getCategoryId());
 
@@ -48,6 +52,7 @@ public class ProductManagementApplicationService {
         product.setCategory(category);
 
         productRepository.save(product);
+        return mapper.toDetailOutput(product, ProductDetailOutput.class);
     }
 
     public void disable(UUID productId) {

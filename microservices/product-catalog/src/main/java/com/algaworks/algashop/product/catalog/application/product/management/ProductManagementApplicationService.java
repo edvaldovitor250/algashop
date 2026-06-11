@@ -44,6 +44,7 @@ public class ProductManagementApplicationService {
     }
 
     @CachPut(cacheNames = "algashop:products:v1", key = "#productId", condition = "#input.enabled == true")
+    @CachEvict(cacheNames = "algashop:products:v1", key = "#productId", condition = "#input.enabled == false")
     public ProductDetailOutput update(UUID productId, ProductInput input) {
         Product product = findProduct(productId);
         Category category = findCategory(input.getCategoryId());
@@ -55,12 +56,14 @@ public class ProductManagementApplicationService {
         return mapper.toDetailOutput(product, ProductDetailOutput.class);
     }
 
+    @CachEvict(cacheNames = "algashop:products:v1", key = "#result.id")
     public void disable(UUID productId) {
         Product product = findProduct(productId);
         product.disable();
         productRepository.save(product);
     }
 
+    @CachEvict(cacheNames = "algashop:products:v1", key = "#productId")
     public void enable(UUID productId) {
         Product product = findProduct(productId);
         product.enable();

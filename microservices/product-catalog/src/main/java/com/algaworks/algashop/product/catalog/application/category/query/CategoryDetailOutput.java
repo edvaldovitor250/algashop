@@ -11,7 +11,7 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CategoryDetailOutput {
+public class CategoryDetailOutput implements Serializable {
 
     private UUID id;
     private String name;

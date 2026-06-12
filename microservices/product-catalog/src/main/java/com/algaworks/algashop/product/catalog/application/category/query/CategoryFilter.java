@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@SuperBuilder
 public class CategoryFilter extends SortablePageFilter<CategoryFilter.SortType> {
     private String name;
     private Boolean enabled;
@@ -20,6 +21,27 @@ public class CategoryFilter extends SortablePageFilter<CategoryFilter.SortType> 
     @Override
     public Sort.Direction getSortDirectionOrDefault() {
         return getSortDirection() == null ? Sort.Direction.ASC : getSortDirection();
+    }
+
+    public boolean isCacheable() {
+        return isDefaultFilter();
+    }
+
+    private boolean isDefaultFilter(){
+        return this.equals(defaultFilter());
+    }
+
+    public static CategoryFilter defaultFilter() {
+        return CategoryFilter.builder()
+        .name(null)
+                .enabled(true)
+                .sortByProperty(CategoryFilter.SortType.NAME)
+                .sortDirection(Sort.Direction.ASC)
+                .build();
+    }
+
+    public boolean isDefaultFilter(){
+        return Boolean.TRUE.equals(enabled) && name == null;
     }
 
     @Getter

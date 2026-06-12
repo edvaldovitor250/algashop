@@ -21,6 +21,11 @@ public class ResilienceCacheErrorHandler implements CacheErrorHandler {
     @Override
     public void handleCachePutError(RuntimeException exception, Cache cache, Object key, @Nullable Object value) {
         String method = "PUT";
+        if(exception instanceof SerializationException){
+            logWarn(exception, cache, key, method);
+        } else {
+            logError(exception, cache, key, method);
+        }
         logWarn(exception, cache, key, method);
     }
 
@@ -42,6 +47,16 @@ public class ResilienceCacheErrorHandler implements CacheErrorHandler {
                 cache.getName(),
                 key,
                 exception.getClass().getSimpleName()
+        );
+    }
+
+    private void logWarn(RuntimeException exception, Cache cache, Object key, String method) {
+        log.error("Cache {} error | cache='{}' | key = '{}' | cause='{}'",
+                method,
+                cache.getName(),
+                key,
+                exception.getClass().getSimpleName(),
+                exception
         );
     }
 }

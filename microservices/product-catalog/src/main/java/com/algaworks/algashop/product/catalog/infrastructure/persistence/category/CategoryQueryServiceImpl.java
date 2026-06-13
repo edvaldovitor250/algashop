@@ -84,6 +84,16 @@ public class CategoryQueryServiceImpl implements CategoryQueryService {
     }
 
     @Override
+    public OffsetDateTime lastModifiedAt() {
+        AggregationExpressionCriteria criteria = ComparisonOperators.Gte.valueOf("updatedAt").greaterThanEqualToValue(OffsetDateTime.now().minusMinutes(10));
+        Query query = new Query(criteria);
+        query.with(Sort.by(Sort.Direction.DESC, "updatedAt"));
+        query.limit(1);
+        Category category = mongoOperations.findOne(query, Category.class);
+        return category != null ? category.getUpdatedAt() : OffsetDateTime.now();
+    }
+
+    @Override
     public CategoryDetailOutput findById(UUID categoryId) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new CategoryNotFoundException(categoryId));

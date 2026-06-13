@@ -17,4 +17,7 @@ public class CategoryDetailOutput implements Serializable {
     private String name;
     private Boolean enabled;
 
+    private Long version;
+    private OffsetDateTime updatedAt;
+
 }

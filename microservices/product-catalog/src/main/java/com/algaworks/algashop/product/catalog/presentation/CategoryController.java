@@ -16,14 +16,27 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/categories")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*")
 public class CategoryController {
 
     private final CategoryQueryService categoryQueryService;
     private final CategoryManagementApplicationService categoryManagementApplicationService;
 
     @GetMapping
-    public PageModel<CategoryDetailOutput> filter(CategoryFilter filter) {
-        return categoryQueryService.filter(filter);
+    public PageModel<CategoryDetailOutput> filter(CategoryFilter filter, WebRequest webRequest) {
+        OffsetDateTime lastModifiedAt = categoryQueryService.lastModifiedAt();
+
+        if(webRequest.checkNotModified(lastModifiedAt.toEpochSecond())) {
+            return ResponseEntity.notModified()
+                    .cacheControl(CacheControl.maxAge(Duration.ofMinutes(10)))
+                    .build();
+        }
+
+        PageModel<CategoryDetailOutput> pageModel = categoryQueryService.filter(filter);
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.maxAge(Duration.ofMinutes(10)))
+                .body(pageModel);
+
     }
 
     @PostMapping
@@ -34,8 +47,10 @@ public class CategoryController {
     }
 
     @GetMapping("/{categoryId}")
-    public CategoryDetailOutput findById(@PathVariable UUID categoryId) {
-        return categoryQueryService.findById(categoryId);
+    public ResponseEntity<CategoryDetailOutput> findById(@PathVariable UUID categoryId) {
+        return ResponseEntity.ok
+                .cacheControl(CacheControl.maxAge(Duration.ofMinutes(10)))
+                .body(categoryQueryService.findById(categoryId));
     }
 
     @PutMapping("/{categoryId}")

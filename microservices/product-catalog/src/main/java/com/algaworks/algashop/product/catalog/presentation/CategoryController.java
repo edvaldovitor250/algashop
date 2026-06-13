@@ -25,6 +25,11 @@ public class CategoryController {
     @GetMapping
     public PageModel<CategoryDetailOutput> filter(CategoryFilter filter, WebRequest webRequest) {
         OffsetDateTime lastModifiedAt = categoryQueryService.lastModifiedAt();
+    
+        if(!filter.isCacheable()) {
+            return categoryQueryService.filter(filter);
+        }
+
 
         if(webRequest.checkNotModified(lastModifiedAt.toEpochSecond())) {
             return ResponseEntity.notModified()

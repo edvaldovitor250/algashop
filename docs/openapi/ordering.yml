@@ -416,6 +416,33 @@ paths:
       responses: 
         204: 
           description: OK
+  /api/v1/shipping-cost-previews:
+    post:
+      summary: Preview shipping cost
+      description: Calculates a preview of the shipping cost and expected delivery date based on the destination zip code.
+      tags:
+        - Shipping
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShippingCostPreviewInput'
+      responses:
+        200:
+          description: Shipping cost preview calculated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShippingCostPreviewOutput'
+        400:
+          $ref: "#/components/responses/BadRequest"
+        409:
+          $ref: "#/components/responses/Conflict"
+        422:
+          $ref: "#/components/responses/UnprocessableEntity"
+        500:
+          $ref: "#/components/responses/InternalError"
 
 components:
   parameters:
@@ -1137,3 +1164,29 @@ components:
         customerId:
           type: string
           example: '6a6ca34c-e65c-496e-adaf-f872e1784003'
+    ShippingCostPreviewInput:
+      type: object
+      required:
+        - zipCode
+      properties:
+        zipCode:
+          type: string
+          description: Destination ZIP code
+          example: "12345"
+
+    ShippingCostPreviewOutput:
+      type: object
+      required:
+        - cost
+        - expectedDate
+      properties:
+        cost:
+          type: number
+          format: decimal
+          description: Calculated shipping cost
+          example: 29.90
+        expectedDate:
+          type: string
+          format: date
+          description: Expected delivery date
+          example: "2026-02-01"

@@ -33,6 +33,8 @@ services:
           memory: 256M
     environment:
       SPRING_PROFILES_ACTIVE: docker
+      SERVER_TOMCAT_THREADS_MAX: 10
+      SPRING_THREADPOOL_VIRTUAL_THREADS_ENABLED: true
   algashop-billing:
     image: algashop/billing:dev
     restart: no

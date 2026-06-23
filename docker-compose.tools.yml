@@ -6,6 +6,10 @@ services:
     volumes:
       - ./etc/wiremock:/home/wiremock/mappings
     command: --verbose --disable-http2-plain
+    deploy:
+      resources:
+        limits:
+          memory: 512M
   algashop-postgres:
     image: postgres:17-alpine
     deploy:
@@ -110,24 +114,24 @@ services:
     command: >
       "
       echo 'Configuring MongoDB replica set...'
-      
+
       mongosh --host algashop-mongodb-1 --eval '
         rs.initiate({
           _id: \"rs0\",
           members: [
-            { _id: 0, host: \"algashop-mongodb-1:27017\"},
-            { _id: 1, host: \"algashop-mongodb-2:27017\"},
-            { _id: 2, host: \"algashop-mongodb-3:27017\"}
+            { _id: 0, host: \"algashop-mongodb-1:27017\", priority: 2},
+            { _id: 1, host: \"algashop-mongodb-2:27017\", priority: 0},
+            { _id: 2, host: \"algashop-mongodb-3:27017\", priority: 0}
           ]
         })
       ' || true;
-      
+
       mongosh --host algashop-mongodb-1 --eval 'printjson(rs.status())'
       "
-    restart: "no"
+    restart: no
   algashop-redis:
     image: redis:8.4
-    restart: unless-stopped
+    restart: no
     ports:
       - 6379:6379
     command: [
@@ -150,6 +154,23 @@ services:
           memory: 512M
     environment:
       REDIS_PASSWORD: algashop
+  algashop-localstack:
+    image: localstack/localstack:4.13.1
+    ports:
+      - 4566:4566
+      - 4510-4559:4510-4559
+    environment:
+      SERVICES: s3
+      DEBUG: 1
+    volumes:
+      - ./etc/aws/init.sh:/etc/localstack/init/ready.d/init-aws.sh
+      - ./etc/aws:/etc/aws
+    healthcheck:
+      test: curl --location 'http://localhost:4566/_localstack/health'
+    deploy:
+      resources:
+        limits:
+          memory: 512M
 volumes:
   algashop-postgres:
   algashop-mongodb-1:

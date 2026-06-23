@@ -2,6 +2,7 @@ package com.algaworks.algashop.product.catalog.application.category.query;
 
 import com.algaworks.algashop.product.catalog.application.utility.SortablePageFilter;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.springframework.data.domain.Sort;
 
 @Data
@@ -27,21 +28,19 @@ public class CategoryFilter extends SortablePageFilter<CategoryFilter.SortType> 
         return isDefaultFilter();
     }
 
-    private boolean isDefaultFilter(){
+    private boolean isDefaultFilter() {
         return this.equals(defaultFilter());
     }
 
     public static CategoryFilter defaultFilter() {
         return CategoryFilter.builder()
-        .name(null)
+                .name(null)
                 .enabled(true)
-                .sortByProperty(CategoryFilter.SortType.NAME)
+                .page(0)
+                .size(15)
                 .sortDirection(Sort.Direction.ASC)
+                .sortByProperty(SortType.NAME)
                 .build();
-    }
-
-    public boolean isDefaultFilter(){
-        return Boolean.TRUE.equals(enabled) && name == null;
     }
 
     @Getter

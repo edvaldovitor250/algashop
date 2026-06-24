@@ -16,6 +16,7 @@ import java.util.UUID;
 public class ProductImagesController {
 
 	private final ProductImageManagementApplicationService managementService;
+	private final ProductImageQueryService queryService;
 
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
@@ -35,5 +36,16 @@ public class ProductImagesController {
 	public void primary(@PathVariable UUID productId, @PathVariable UUID imageId) {
 		managementService.primary(productId, imageId);
 	}
+	
+    @GetMapping
+    public List<ImageOutput> getAll(@PathVariable UUID productId) {
+        return queryService.getAllImages(productId);
+    }
+
+    @GetMapping("{imageId}")
+    public ImageOutput getOne(@PathVariable UUID productId, @PathVariable UUID imageId) {
+        return queryService.getImage(productId, imageId);
+    }
+
 
 }

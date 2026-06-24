@@ -34,6 +34,8 @@ public class ProductSummaryOutput {
 
     private Float score;
 
+    private ImageOutput mainImage;
+
     public String getSlug() {
         return Slugfier.slugify(this.getName());
     }

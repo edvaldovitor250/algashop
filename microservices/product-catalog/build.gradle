@@ -52,6 +52,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webmvc'
     implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'commons-io:commons-io:2.21.0'
+     implementation 'org.springframework.boot:spring-boot-starter-security-oauth2-resource-server'
+    testImplementation 'org.springframework.boot:spring-boot-starter-security-oauth2-resource-server-test'
     implementation platform("io.awspring.cloud:spring-cloud-aws-dependencies:${springCloudAwsVersion}")
     implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'

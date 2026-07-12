@@ -8,12 +8,19 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
 import java.util.UUID;
 
 @Service("securityCheck")
 @Slf4j
 public class OAuth2SecurityCheckApplicationServiceImpl
         implements SecurityCheckApplicationService {
+
+    private static final String SCOPE_PRODUCTS_WRITE = "SCOPE_products:write";
+    private static final String SCOPE_PRODUCTS_STOCK_WRITE = "SCOPE_products:stock:write";
+    private static final String SCOPE_CATEGORIES_WRITE = "SCOPE_categories:write";
+    private static final String ROLE_MANAGER = "ROLE_MANAGER";
+    private static final String ROLE_OPERATOR = "ROLE_OPERATOR";
 
     @Override
     public UUID getAuthenticatedUserId() {
@@ -50,6 +57,38 @@ public class OAuth2SecurityCheckApplicationServiceImpl
             return false;
         }
         return jwt.getAudience().contains(jwt.getSubject());
+    }
+
+    @Override
+    public boolean isManagerOrOperator() {
+        return hasAuthority(ROLE_MANAGER) || hasAuthority(ROLE_OPERATOR);
+    }
+
+    @Override
+    public boolean canWriteProducts() {
+        return isManagerOrOperator() && hasAuthority(SCOPE_PRODUCTS_WRITE);
+    }
+
+    @Override
+    public boolean canWriteProductsStock() {
+        return isMachineAuthenticated() && hasAuthority(SCOPE_PRODUCTS_STOCK_WRITE);
+    }
+
+    @Override
+    public boolean canWriteCategories() {
+        return isManagerOrOperator() && hasAuthority(SCOPE_CATEGORIES_WRITE);
+    }
+
+    private boolean hasAuthority(String rawAuthority) {
+        Authentication authentication;
+        try {
+            authentication = getAuthentication();
+        } catch (IllegalStateException e) {
+            log.debug(e.getMessage(), e);
+            return false;
+        }
+        return authentication.getAuthorities()
+                .stream().anyMatch(a -> Objects.equals(a.getAuthority(), rawAuthority));
     }
 
     private Jwt getJwt() {

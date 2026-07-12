@@ -7,5 +7,9 @@ public interface SecurityCheckApplicationService {
     UUID getAuthenticatedUserId();
     boolean isAuthenticated();
     boolean isMachineAuthenticated();
+    boolean isManagerOrOperator();
+    boolean canWriteProducts();
+    boolean canWriteProductsStock();
+    boolean canWriteCategories();
 
 }

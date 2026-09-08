@@ -11,4 +11,3 @@ spring:
         - docker-env
       production:
         - base
-        - production-env

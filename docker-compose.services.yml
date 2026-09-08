@@ -160,21 +160,21 @@ services:
       - 4566:4566
       - 4510-4559:4510-4559
     environment:
-      SERVICES: s3
+      SERVICES: s3,secretsmanager,ssm
       DEBUG: 1
+      LS_ACCESS_KEY_ID: test
+      LS_SECRET_ACCESS_KEY: test
+      LS_REGION: us-east-1
+    volumes:
+      - ./etc/aws/init.sh:/etc/localstack/init/ready.d/init-aws.sh
+      - ./etc/aws:/etc/aws
+      - ./etc/images:/etc/images
     healthcheck:
       test: curl --location 'http://localhost:4566/_localstack/health'
     deploy:
       resources:
         limits:
           memory: 512M
-volumes:
-  algashop-postgres:
-  algashop-mongodb-1:
-  algashop-mongodb-2:
-  algashop-mongodb-3:
-
-
   algashop-authorization-server:
     image: algashop/authorization-server:dev
     restart: no
@@ -189,3 +189,9 @@ volumes:
           memory: 512M
     environment:
       SPRING_PROFILES_ACTIVE: docker
+
+volumes:
+  algashop-postgres:
+  algashop-mongodb-1:
+  algashop-mongodb-2:
+  algashop-mongodb-3:

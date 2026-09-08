@@ -1,8 +1,8 @@
 #!/bin/bash
 
-AWS_ACCESS_KEY_ID=LS_ACCESS_KEY_ID
-AWS_SECRET_ACCESS_KEY=LS_SECRET_ACCESS_KEY
-AWS_DEFAULT_REGION=LS_REGION
+AWS_ACCESS_KEY_ID=test
+AWS_SECRET_ACCESS_KEY=test
+AWS_DEFAULT_REGION=us-east-1
 
 
 openssl genpkey -algorithm RSA -out /tmp/algashop-private-key.pem -pkeyopt rsa_keygen_bits:2048

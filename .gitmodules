@@ -13,3 +13,7 @@
 [submodule "microservices/authorization-server"]
 	path = microservices/authorization-server
 	url = git@github.com:algaworks/ems-algashop-authorization-server.git
+[submodule "algashop"]
+	path = algashop
+	url = git@github.com:edvaldovitor250/algashop.git
+	branch = main

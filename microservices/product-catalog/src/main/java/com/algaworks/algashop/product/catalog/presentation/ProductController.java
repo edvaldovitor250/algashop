@@ -43,8 +43,14 @@ public class ProductController {
 
     @GetMapping("/{productId}")
     @CanReadProducts
+    @SneakyThrows
     public ResponseEntity<ProductDetailOutput> findById(@PathVariable UUID productId) {
         ProductDetailOutput product = productQueryService.findById(productId);
+        
+        if(Math.random() < 0.5) {
+            throw new RuntimeException("Simulated error for testing purposes");
+        }
+        
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(Duration.ofMinutes(1)).cachePublic())
                 .eTag("product:id:" + product.getId() + ":v:" + product.getVersion())
